@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HireLens Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container py-5">
+    <h2 class="fw-bold">📊 HireLens Report</h2>
+    <p class="text-muted">Total JD Keywords Detected: <b>{{ total_keywords }}</b></p>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="card p-4 shadow-sm">
+                <h5 class="fw-semibold">ATS Match Score</h5>
+                <h2 class="text-success">{{ ats_score }}%</h2>
+                <p class="text-muted mb-0">Based on keyword matching with JD.</p>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card p-4 shadow-sm">
+                <h5 class="fw-semibold">Skill Proof Score</h5>
+                <h2 class="text-primary">{{ proof_score }}%</h2>
+                <p class="text-muted mb-0">Checks if skills are supported by projects/work evidence.</p>
+            </div>
+        </div>
+    </div>
+    
+<!-- Role Fit Score -->
+{% if role_fit_score is not none %}
+<div class="mt-3 card p-4 shadow-sm">
+    <h5 class="fw-semibold">🎯 Role Fit Score</h5>
+    <h2 class="text-dark">{{ role_fit_score }}%</h2>
+    <p class="text-muted mb-2">Based on company-style rubric for selected role.</p>
+
+    {% if rubric_breakdown %}
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Skill</th>
+                    <th>Weight</th>
+                    <th>Present</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in rubric_breakdown %}
+                <tr>
+                    <td><b>{{ item.skill }}</b></td>
+                    <td>{{ item.weight }}</td>
+                    <td>{{ "✅" if item.present else "❌" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+    <!-- Matched Keywords -->
+    <div class="mt-4 card p-4 shadow-sm">
+        <h5 class="fw-semibold">✅ Matched Keywords</h5>
+        {% if matched %}
+            <div class="d-flex flex-wrap gap-2">
+                {% for k in matched %}
+                    <span class="badge bg-success">{{ k }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">No keywords matched.</p>
+        {% endif %}
+    </div>
+
+    <!-- Missing Keywords -->
+    <div class="mt-3 card p-4 shadow-sm">
+        <h5 class="fw-semibold">❌ Missing Keywords</h5>
+        {% if missing %}
+            <div class="d-flex flex-wrap gap-2">
+                {% for k in missing %}
+                    <span class="badge bg-danger">{{ k }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">Great! No missing keywords detected.</p>
+        {% endif %}
+    </div>
+
+    <!-- Skill Evidence Table -->
+    <div class="mt-3 card p-4 shadow-sm">
+        <h5 class="fw-semibold">🧾 Skill Evidence (Proof Table)</h5>
+
+        {% if evidence %}
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle mt-2">
+                <thead class="table-light">
+                    <tr>
+                        <th>Skill</th>
+                        <th>In Skills</th>
+                        <th>In Projects</th>
+                        <th>In Experience</th>
+                        <th>Strength</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for skill, data in evidence.items() %}
+                    <tr>
+                        <td><b>{{ skill }}</b></td>
+                        <td>{{ "✅" if data.in_skills else "❌" }}</td>
+                        <td>{{ "✅" if data.in_projects else "❌" }}</td>
+                        <td>{{ "✅" if data.in_experience else "❌" }}</td>
+                        <td>
+                            {% if data.strength == "Strong" %}
+                                <span class="badge bg-success">Strong</span>
+                            {% elif data.strength == "Medium" %}
+                                <span class="badge bg-warning text-dark">Medium</span>
+                            {% elif data.strength == "Weak" %}
+                                <span class="badge bg-secondary">Weak</span>
+                            {% else %}
+                                <span class="badge bg-danger">Missing</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p class="text-muted">No evidence data available.</p>
+        {% endif %}
+    </div>
+
+    <!-- Anti-Cheat Detector -->
+<div class="mt-3 card p-4 shadow-sm">
+    <h5 class="fw-semibold">🛡️ Keyword Stuffing Risk</h5>
+
+    {% if risk_level %}
+        {% if risk_level == "HIGH" %}
+            <span class="badge bg-danger fs-6">HIGH</span>
+        {% elif risk_level == "MEDIUM" %}
+            <span class="badge bg-warning text-dark fs-6">MEDIUM</span>
+        {% else %}
+            <span class="badge bg-success fs-6">LOW</span>
+        {% endif %}
+    {% endif %}
+
+    {% if risk_stats %}
+        <p class="text-muted mt-2 mb-1">
+            Total Skills Checked: <b>{{ risk_stats.total }}</b> |
+            Strong Proof: <b>{{ risk_stats.strong }}</b> |
+            Weak Proof: <b>{{ risk_stats.weak }}</b>
+        </p>
+    {% endif %}
+
+    {% if risk_reasons %}
+        <ul class="mt-2">
+            {% for r in risk_reasons %}
+                <li>{{ r }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+
+<!-- Interview Questions -->
+<div class="mt-3 card p-4 shadow-sm">
+    <h5 class="fw-semibold">🎤 Interview Questions to Prepare</h5>
+
+    {% if interview_questions %}
+        <ol class="mt-2">
+            {% for q in interview_questions %}
+                <li>{{ q }}</li>
+            {% endfor %}
+        </ol>
+    {% else %}
+        <p class="text-muted">No questions generated. Try a different JD or role.</p>
+    {% endif %}
+</div>
+
+    <!-- Suggestions -->
+    <div class="mt-3 card p-4 shadow-sm">
+        <h5 class="fw-semibold">💡 Suggestions</h5>
+        <ul>
+            {% for s in suggestions %}
+                <li>{{ s }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <a href="/" class="btn btn-outline-dark mt-4">Analyze Another Resume</a>
+</div>
+
+</body>
+</html>

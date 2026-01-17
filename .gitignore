@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual env
+venv/
+.env/
+
+# Flask
+instance/
+*.db
+
+# Uploads (user files)
+uploads/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/

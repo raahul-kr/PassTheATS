@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HireLens - Resume ATS Analyzer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container py-5">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold">HireLens 🧠</h2>
+            <p class="text-muted mb-0">Not just keywords. Proof matters.</p>
+
+            {% if session.get("user_name") %}
+                <small class="text-success">
+                    Logged in as <b>{{ session.get("user_name") }}</b>
+                </small>
+            {% else %}
+                <small class="text-muted">
+                    You are not logged in.
+                </small>
+            {% endif %}
+        </div>
+
+        <!-- Top Buttons -->
+        <div class="d-flex gap-2">
+            <a href="/demo" class="btn btn-outline-dark">Try Demo</a>
+
+            {% if session.get("user_id") %}
+                <a href="/history" class="btn btn-dark">History</a>
+                <a href="/logout" class="btn btn-outline-danger">Logout</a>
+            {% else %}
+                <a href="/login" class="btn btn-dark">Login</a>
+                <a href="/register" class="btn btn-outline-dark">Register</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <hr class="my-4">
+
+    {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    <!-- Main Form -->
+    <form method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Select Role Template (Optional)</label>
+            <select name="role" class="form-select">
+                <option value="">-- Select a role (optional) --</option>
+                <option value="cloud_engineer">Cloud Engineer</option>
+                <option value="devops_intern">DevOps Intern</option>
+                <option value="backend_developer">Backend Developer</option>
+                <option value="frontend_developer">Frontend Developer</option>
+            </select>
+            <div class="form-text">
+                If you don’t have a JD, select a role and we will auto-fill a sample JD.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Upload Resume (PDF)</label>
+            <input type="file" name="resume" class="form-control" accept=".pdf" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Paste Job Description (Optional if role selected)</label>
+            <textarea name="job_description" class="form-control" rows="6" placeholder="Paste job description here..."></textarea>
+        </div>
+
+        <button class="btn btn-dark w-100">Analyze Resume</button>
+
+        {% if session.get("user_id") %}
+            <p class="text-muted mt-2 mb-0 text-center">
+                Your report will be saved automatically in <b>History</b>.
+            </p>
+        {% else %}
+            <p class="text-muted mt-2 mb-0 text-center">
+                Login to save your reports in History.
+            </p>
+        {% endif %}
+    </form>
+
+</div>
+
+</body>
+</html>
