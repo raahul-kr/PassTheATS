@@ -80,7 +80,7 @@ PassTheATS/
 │
 └── uploads/
     └── resumes/
-
+```
 
 ## ⚙️ Installation & Run Locally
 
@@ -90,21 +90,23 @@ Follow these steps to get the project up and running on your local machine.
 Open your terminal and run the following commands to clone the repo and navigate into the directory:
 
 ```bash
-git clone [https://github.com/raahul-kr/PassTheATS.git](https://github.com/raahul-kr/PassTheATS.git)
+git clone https://github.com/raahul-kr/PassTheATS.git
+```
+```
 cd PassTheATS
-
+```
 ### 2️⃣ Install dependencies
 Install the required Python packages using pip:
 
 ```bash
 pip install -r requirements.txt
-
+```
 ### 3️⃣ Run the app
 Start the Flask development server:
 
 ```bash
 python app.py
-
+```
 ### 4️⃣ Open in browser
 Once the server is running, open your web browser and navigate to:
 
