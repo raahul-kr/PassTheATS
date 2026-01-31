@@ -5,7 +5,7 @@
 # load_dotenv()
 
 # def generate_ai_suggestions(ats_score, proof_score, missing_skills, role):
-#     api_key = os.getenv("AIzaSyCsTQv_Ea74TGai0vsoaW1U5-gUjZQEE-A")
+#     api_key = os.getenv("")
 #     if not api_key:
 #         return []
 
