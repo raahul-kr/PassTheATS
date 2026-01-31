@@ -1,91 +1,200 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>PassTheATS - Resume ATS Analyzer</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PassTheATS | AI Resume Optimizer</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
 </head>
-<body class="bg-light">
+<body>
 
-<div class="container py-5">
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+                <i class="bi bi-lightning-charge-fill text-primary fs-4"></i>
+                <span class="brand-logo fs-4">PassTheATS</span>
+            </a>
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h2 class="fw-bold">PassTheATS 🧠</h2>
-            <p class="text-muted mb-0">Not just keywords. Proof matters.</p>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+                    
+                    <button class="btn btn-link nav-link text-secondary" onclick="toggleTheme()" title="Toggle Theme" style="text-decoration: none;">
+                        <i id="theme-icon" class="bi bi-moon-stars-fill fs-5"></i>
+                    </button>
 
-            {% if session.get("user_name") %}
-                <small class="text-success">
-                    Logged in as <b>{{ session.get("user_name") }}</b>
-                </small>
-            {% else %}
-                <small class="text-muted">
-                    You are not logged in.
-                </small>
-            {% endif %}
+                    <a href="/demo" class="btn btn-link text-decoration-none text-secondary fw-medium">Try Text Demo</a>
+                    
+                    {% if session.get("user_id") %}
+                        <a href="/history" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+                            <i class="bi bi-clock-history me-1"></i> History
+                        </a>
+                        <a href="/logout" class="btn btn-dark btn-sm rounded-pill px-3">Logout</a>
+                    {% else %}
+                        <a href="/login" class="btn btn-outline-primary btn-sm rounded-pill px-4">Login</a>
+                        <a href="/register" class="btn btn-primary btn-sm rounded-pill px-4">Get Started</a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
+    </nav>
 
-        <!-- Top Buttons -->
-        <div class="d-flex gap-2">
-            <a href="/demo" class="btn btn-outline-dark">Try Demo</a>
-
-            {% if session.get("user_id") %}
-                <a href="/history" class="btn btn-dark">History</a>
-                <a href="/logout" class="btn btn-outline-danger">Logout</a>
-            {% else %}
-                <a href="/login" class="btn btn-dark">Login</a>
-                <a href="/register" class="btn btn-outline-dark">Register</a>
-            {% endif %}
-        </div>
-    </div>
-
-    <hr class="my-4">
-
-    {% if error %}
-    <div class="alert alert-danger">{{ error }}</div>
-    {% endif %}
-
-    <!-- Main Form -->
-    <form method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
-
-        <div class="mb-3">
-            <label class="form-label fw-semibold">Select Role Template (Optional)</label>
-            <select name="role" class="form-select">
-                <option value="">-- Select a role (optional) --</option>
-                <option value="cloud_engineer">Cloud Engineer</option>
-                <option value="devops_intern">DevOps Intern</option>
-                <option value="backend_developer">Backend Developer</option>
-                <option value="frontend_developer">Frontend Developer</option>
-            </select>
-            <div class="form-text">
-                If you don’t have a JD, select a role and we will auto-fill a sample JD.
+    <div class="container py-5 flex-grow-1">
+        
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8 text-center">
+                <h1 class="display-5 fw-bold mb-3">Beat the ATS with <span class="text-primary">Proof.</span></h1>
+                <p class="lead text-secondary mb-0">
+                    Don't just keyword stuff. Our AI analyzes your PDF against the JD to ensure you prove your skills.
+                </p>
+                
+                {% if error %}
+                <div class="alert alert-danger shadow-sm rounded-3 mt-4 border-0 d-inline-flex align-items-center">
+                    <i class="bi bi-exclamation-octagon-fill me-2"></i> {{ error }}
+                </div>
+                {% endif %}
             </div>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label fw-semibold">Upload Resume (PDF)</label>
-            <input type="file" name="resume" class="form-control" accept=".pdf" required>
+        <div class="row justify-content-center">
+            <div class="col-xl-10">
+                <form method="POST" enctype="multipart/form-data" class="glass-card p-4 p-md-5">
+                    
+                    <div class="row g-5">
+                        
+                        <div class="col-lg-6 border-end-lg">
+                            <h5 class="fw-bold mb-4 d-flex align-items-center">
+                                <span class="badge bg-primary rounded-circle me-2">1</span> Upload Resume
+                            </h5>
+                            
+                            <div class="upload-area position-relative" id="dropZone">
+                                <input type="file" name="resume" id="resumeFile" class="position-absolute top-0 start-0 w-100 h-100 opacity-0" style="cursor: pointer;" accept=".pdf" required onchange="updateFileName(this)">
+                                
+                                <div id="uploadPlaceholder">
+                                    <i class="bi bi-cloud-arrow-up-fill upload-icon"></i>
+                                    <h5 class="fw-bold text-dark">Click or Drop PDF</h5>
+                                    <p class="text-muted small mb-0">Supported format: .PDF (Max 5MB)</p>
+                                </div>
+                                
+                                <div id="fileSelected" class="d-none">
+                                    <i class="bi bi-file-earmark-pdf-fill text-danger" style="font-size: 3rem;"></i>
+                                    <h6 class="fw-bold text-dark mt-2" id="fileName">filename.pdf</h6>
+                                    <p class="text-success small fw-bold"><i class="bi bi-check-circle me-1"></i>Ready to scan</p>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center mt-3">
+                                <small class="text-muted fst-italic">
+                                    <i class="bi bi-shield-lock me-1"></i> Your data is processed securely.
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <h5 class="fw-bold mb-4 d-flex align-items-center">
+                                <span class="badge bg-primary rounded-circle me-2">2</span> Job Details
+                            </h5>
+
+                            <div class="form-floating mb-3">
+                                <select name="role" class="form-select" id="roleSelect">
+                                    <option value="">-- Custom / None --</option>
+                                    <option value="cloud_engineer">Cloud Engineer</option>
+                                    <option value="devops_intern">DevOps Intern</option>
+                                    <option value="backend_developer">Backend Developer</option>
+                                    <option value="frontend_developer">Frontend Developer</option>
+                                </select>
+                                <label for="roleSelect">Target Role (Auto-fills JD)</label>
+                            </div>
+
+                            <div class="d-flex align-items-center my-3">
+                                <hr class="flex-grow-1 border-secondary opacity-25">
+                                <span class="px-2 text-muted small fw-bold">OR</span>
+                                <hr class="flex-grow-1 border-secondary opacity-25">
+                            </div>
+
+                            <div class="form-floating mb-4">
+                                <textarea name="job_description" class="form-control" placeholder="Paste JD" id="jdText" style="height: 150px"></textarea>
+                                <label for="jdText">Paste Job Description</label>
+                            </div>
+
+                            <button class="btn btn-primary-custom w-100 shadow-sm">
+                                <i class="bi bi-stars me-2"></i> Analyze My Resume
+                            </button>
+                            
+                            {% if session.get("user_id") %}
+                                <p class="text-center text-muted small mt-2 mb-0">Result will be saved to History.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label fw-semibold">Paste Job Description (Optional if role selected)</label>
-            <textarea name="job_description" class="form-control" rows="6" placeholder="Paste job description here..."></textarea>
+        <div class="row mt-5 pt-4 g-4 justify-content-center">
+            <div class="col-md-4 col-lg-3">
+                <div class="d-flex align-items-start gap-3">
+                    <div class="feature-icon"><i class="bi bi-bullseye"></i></div>
+                    <div>
+                        <h6 class="fw-bold">Keyword Matching</h6>
+                        <p class="small text-muted">See exactly which keywords you are missing.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <div class="d-flex align-items-start gap-3">
+                    <div class="feature-icon"><i class="bi bi-shield-check"></i></div>
+                    <div>
+                        <h6 class="fw-bold">Evidence Check</h6>
+                        <p class="small text-muted">We verify if you actually proved your skills.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <div class="d-flex align-items-start gap-3">
+                    <div class="feature-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                    <div>
+                        <h6 class="fw-bold">Risk Score</h6>
+                        <p class="small text-muted">Know your chances before you hit apply.</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <button class="btn btn-dark w-100">Analyze Resume</button>
+    </div>
 
-        {% if session.get("user_id") %}
-            <p class="text-muted mt-2 mb-0 text-center">
-                Your report will be saved automatically in <b>History</b>.
-            </p>
-        {% else %}
-            <p class="text-muted mt-2 mb-0 text-center">
-                Login to save your reports in History.
-            </p>
-        {% endif %}
-    </form>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
 
-</div>
+    <script>
+        function updateFileName(input) {
+            const placeholder = document.getElementById('uploadPlaceholder');
+            const fileSelected = document.getElementById('fileSelected');
+            const fileNameDisplay = document.getElementById('fileName');
+            const dropZone = document.getElementById('dropZone');
+
+            if (input.files && input.files[0]) {
+                placeholder.classList.add('d-none');
+                fileSelected.classList.remove('d-none');
+                fileNameDisplay.textContent = input.files[0].name;
+                dropZone.style.borderColor = '#2563eb';
+                dropZone.style.backgroundColor = '#eff6ff';
+            } else {
+                placeholder.classList.remove('d-none');
+                fileSelected.classList.add('d-none');
+                dropZone.style.borderColor = '#cbd5e1';
+                dropZone.style.backgroundColor = '#f8fafc';
+            }
+        }
+    </script>
 
 </body>
 </html>

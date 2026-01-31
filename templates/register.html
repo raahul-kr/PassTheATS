@@ -1,42 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Register - PassTheATS</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | PassTheATS</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body class="bg-light">
+<body class="d-flex align-items-center justify-content-center position-relative">
 
-<div class="container py-5" style="max-width: 500px;">
-    <h3 class="fw-bold">Create Account</h3>
-    <p class="text-muted">Save your analysis history.</p>
+    <a href="/" class="back-link">
+        <i class="bi bi-arrow-left"></i> Home
+    </a>
 
-    {% if error %}
-    <div class="alert alert-danger">{{ error }}</div>
-    {% endif %}
+    <button class="btn btn-link text-secondary position-absolute top-0 end-0 m-3 m-md-4" onclick="toggleTheme()" title="Toggle Theme" style="text-decoration: none; z-index: 10;">
+        <i id="theme-icon" class="bi bi-moon-stars-fill fs-4"></i>
+    </button>
 
-    <form method="POST" class="card p-4 shadow-sm">
-        <div class="mb-3">
-            <label class="form-label fw-semibold">Name</label>
-            <input name="name" class="form-control" required>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                
+                <div class="text-center mb-4">
+                    <div class="mb-2">
+                        <i class="bi bi-lightning-charge-fill text-primary fs-3"></i>
+                    </div>
+                    <h3 class="fw-bold brand-logo">PassTheATS</h3>
+                    <p class="text-secondary small">Join thousands of job seekers improving their odds.</p>
+                </div>
+
+                {% if error %}
+                <div class="alert alert-danger shadow-sm border-0 d-flex align-items-center gap-2 p-3 rounded-3 mb-4">
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                    <div>{{ error }}</div>
+                </div>
+                {% endif %}
+
+                <form method="POST" class="glass-card p-4 p-md-5">
+                    
+                    <h5 class="fw-bold mb-4 text-center">Create Account</h5>
+
+                    <div class="form-floating mb-3">
+                        <input name="name" type="text" class="form-control" id="nameInput" placeholder="John Doe" required>
+                        <label for="nameInput">Full Name</label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input name="email" type="email" class="form-control" id="emailInput" placeholder="name@example.com" required>
+                        <label for="emailInput">Email address</label>
+                    </div>
+
+                    <div class="form-floating mb-4">
+                        <input name="password" type="password" class="form-control" id="passwordInput" placeholder="Password" required>
+                        <label for="passwordInput">Password</label>
+                        <div class="form-text text-muted small">
+                            Must be at least 6 characters long.
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary-custom w-100 mb-3">
+                        Create Account <i class="bi bi-person-plus-fill ms-1"></i>
+                    </button>
+
+                    <div class="text-center mb-4">
+                        <small class="text-muted" style="font-size: 0.75rem;">
+                            By registering, you agree to our Terms & Privacy Policy.
+                        </small>
+                    </div>
+
+                    <hr class="opacity-25 my-3">
+
+                    <div class="text-center">
+                        <p class="text-secondary small mb-1">Already have an account?</p>
+                        <a href="/login" class="btn btn-outline-dark btn-sm rounded-pill px-4">Log in here</a>
+                    </div>
+
+                </form>
+
+                <div class="text-center mt-4">
+                    <small class="text-muted opacity-75">&copy; 2024 PassTheATS. All rights reserved.</small>
+                </div>
+
+            </div>
         </div>
+    </div>
 
-        <div class="mb-3">
-            <label class="form-label fw-semibold">Email</label>
-            <input name="email" type="email" class="form-control" required>
-        </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-        <div class="mb-3">
-            <label class="form-label fw-semibold">Password</label>
-            <input name="password" type="password" class="form-control" required>
-        </div>
-
-        <button class="btn btn-dark w-100">Register</button>
-    </form>
-
-    <p class="mt-3 text-muted">
-        Already have an account? <a href="/login">Login</a>
-    </p>
-</div>
-
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
 </body>
 </html>

@@ -1,98 +1,147 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>History - PassTheATS</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PassTheATS | History</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
 </head>
-<body class="bg-light">
+<body>
 
-<div class="container py-5">
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+                <i class="bi bi-lightning-charge-fill text-primary fs-4"></i>
+                <span class="brand-logo fs-4">PassTheATS</span>
+            </a>
+            
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-link nav-link text-secondary" onclick="toggleTheme()" title="Toggle Theme" style="text-decoration: none;">
+                    <i id="theme-icon" class="bi bi-moon-stars-fill fs-5"></i>
+                </button>
 
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h3 class="fw-bold">📂 Your Report History</h3>
-            <p class="text-muted mb-0">
-                Logged in as <b>{{ session.get("user_name") }}</b>
-            </p>
+                <span class="text-muted small d-none d-md-block">Welcome back, <b>{{ session.get("user_name") }}</b></span>
+                <a href="/" class="btn btn-primary btn-sm rounded-pill px-3">
+                    <i class="bi bi-plus-lg me-1"></i> New Scan
+                </a>
+                <a href="/logout" class="btn btn-outline-danger btn-sm rounded-pill px-3">Logout</a>
+            </div>
         </div>
-        <div class="d-flex gap-2">
-            <a href="/" class="btn btn-outline-dark">Analyze New</a>
-            <a href="/logout" class="btn btn-dark">Logout</a>
+    </nav>
+
+    <div class="container py-5">
+        
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Scan History</h2>
+                <p class="text-secondary mb-0">Manage and review your past resume optimizations.</p>
+            </div>
+            
+            {% if reports %}
+            <div class="d-none d-md-block text-end">
+                <span class="display-6 fw-bold text-primary">{{ reports|length }}</span>
+                <div class="text-muted small text-uppercase fw-bold">Total Scans</div>
+            </div>
+            {% endif %}
         </div>
+
+        {% if reports %}
+        <div class="dashboard-card">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th scope="col">Date Scanned</th>
+                            <th scope="col">Target Role</th>
+                            <th scope="col" class="text-center">ATS Score</th>
+                            <th scope="col" class="text-center">Proof Score</th>
+                            <th scope="col" class="text-center">Risk Level</th>
+                            <th scope="col" class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in reports %}
+                        <tr>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <span class="fw-semibold">{{ r.created_at.strftime("%b %d, %Y") }}</span>
+                                    <span class="text-muted small">{{ r.created_at.strftime("%I:%M %p") }}</span>
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="role-icon">
+                                        <i class="bi bi-briefcase-fill"></i>
+                                    </div>
+                                    <span class="text-truncate" style="max-width: 150px;">
+                                        {{ r.role.replace('_', ' ').title() if r.role else "General Scan" }}
+                                    </span>
+                                </div>
+                            </td>
+
+                            <td class="text-center">
+                                {% set score = r.ats_score %}
+                                <span class="score-pill {% if score >= 80 %}score-high{% elif score >= 50 %}score-med{% else %}score-low{% endif %}">
+                                    {{ score }}%
+                                </span>
+                            </td>
+
+                            <td class="text-center">
+                                {% set p_score = r.proof_score %}
+                                <span class="score-pill {% if p_score >= 80 %}score-high{% elif p_score >= 50 %}score-med{% else %}score-low{% endif %}">
+                                    {{ p_score }}%
+                                </span>
+                            </td>
+
+                            <td class="text-center">
+                                {% if r.risk_level == "HIGH" %}
+                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2 rounded-pill">High Risk</span>
+                                {% elif r.risk_level == "MEDIUM" %}
+                                    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-2 rounded-pill text-dark">Medium</span>
+                                {% else %}
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill">Low Risk</span>
+                                {% endif %}
+                            </td>
+
+                            <td class="text-end">
+                                <a href="/report/{{ r.id }}" class="btn btn-outline-primary btn-action me-1" title="View Report">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="/delete_report/{{ r.id }}" class="btn btn-outline-danger btn-action" 
+                                   onclick="return confirm('Are you sure you want to permanently delete this report?')" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% else %}
+        <div class="dashboard-card p-5 text-center">
+            <div class="mb-3">
+                <i class="bi bi-folder2-open text-muted" style="font-size: 4rem; opacity: 0.5;"></i>
+            </div>
+            <h4 class="fw-bold text-secondary">No Reports Yet</h4>
+            <p class="text-muted mb-4">Run your first ATS analysis to see your history here.</p>
+            <a href="/" class="btn btn-primary px-4 py-2 rounded-pill">
+                Start New Analysis
+            </a>
+        </div>
+        {% endif %}
+
     </div>
-
-    <hr class="my-4">
-
-    {% if reports %}
-        <p class="text-muted mb-2">
-            Total Saved Reports: <b>{{ reports|length }}</b>
-        </p>
-
-        <div class="table-responsive">
-            <table class="table table-bordered align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Date</th>
-                        <th>Role</th>
-                        <th>ATS</th>
-                        <th>Proof</th>
-                        <th>Risk</th>
-                        <th>Role Fit</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {% for r in reports %}
-                    <tr>
-                        <td>{{ r.created_at.strftime("%d %b %Y, %I:%M %p") }}</td>
-                        <td>{{ r.role if r.role else "N/A" }}</td>
-                        <td><b>{{ r.ats_score }}%</b></td>
-                        <td><b>{{ r.proof_score }}%</b></td>
-
-                        <td>
-                            {% if r.risk_level == "HIGH" %}
-                                <span class="badge bg-danger">HIGH</span>
-                            {% elif r.risk_level == "MEDIUM" %}
-                                <span class="badge bg-warning text-dark">MEDIUM</span>
-                            {% else %}
-                                <span class="badge bg-success">LOW</span>
-                            {% endif %}
-                        </td>
-
-                        <td>
-                            {% if r.role_fit_score is not none %}
-                                {{ r.role_fit_score }}%
-                            {% else %}
-                                N/A
-                            {% endif %}
-                        </td>
-
-                        <td class="d-flex gap-2">
-                            <a href="/report/{{ r.id }}" class="btn btn-sm btn-outline-dark">
-                                View
-                            </a>
-
-                            <a href="/delete_report/{{ r.id }}" class="btn btn-sm btn-outline-danger"
-                               onclick="return confirm('Delete this report?')">
-                                Delete
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-    {% else %}
-        <div class="card p-4 shadow-sm">
-            <p class="text-muted mb-0">
-                No reports saved yet. Analyze a resume first!
-            </p>
-        </div>
-    {% endif %}
-
-</div>
-
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
 </body>
 </html>

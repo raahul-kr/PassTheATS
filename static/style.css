@@ -1,0 +1,267 @@
+/* =========================================
+   1. GLOBAL VARIABLES & THEME ENGINE
+   ========================================= */
+:root {
+    /* --- Light Mode Palette --- */
+    --primary-color: #2563eb;
+    --primary-glow: rgba(37, 99, 235, 0.3);
+    
+    --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+    
+    --surface-glass: rgba(255, 255, 255, 0.85);
+    --surface-border: rgba(255, 255, 255, 1);
+    --surface-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.1);
+    
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --text-inverse: #ffffff;
+    
+    --input-bg: rgba(255, 255, 255, 0.6);
+    --input-border: #cbd5e1;
+    
+    --status-success-bg: #dcfce7;
+    --status-success-text: #166534;
+    --status-danger-bg: #fee2e2;
+    --status-danger-text: #991b1b;
+}
+
+/* --- Dark Mode Palette (Neon & Deep Depth) --- */
+[data-bs-theme="dark"] {
+    --primary-color: #60a5fa; /* Brighter Blue */
+    --primary-glow: rgba(96, 165, 250, 0.4);
+    
+    --bg-gradient: radial-gradient(circle at top right, #1e293b 0%, #0f172a 100%);
+    
+    --surface-glass: rgba(30, 41, 59, 0.65);
+    --surface-border: rgba(255, 255, 255, 0.08);
+    --surface-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+    
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+    --text-inverse: #0f172a;
+    
+    --input-bg: rgba(15, 23, 42, 0.6);
+    --input-border: rgba(255, 255, 255, 0.1);
+    
+    --status-success-bg: rgba(22, 163, 74, 0.2);
+    --status-success-text: #4ade80;
+    --status-danger-bg: rgba(220, 38, 38, 0.2);
+    --status-danger-text: #f87171;
+}
+
+/* =========================================
+   2. BASE TYPOGRAPHY & SCROLLBARS
+   ========================================= */
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg-gradient);
+    color: var(--text-main);
+    min-height: 100vh;
+    transition: background 0.4s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+    background-attachment: fixed; /* Parallax feel */
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(100, 116, 139, 0.5);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+}
+
+/* =========================================
+   3. ULTRA GLASSMORPHISM CARDS
+   ========================================= */
+.glass-card, .report-card, .dashboard-card, .card, .navbar {
+    background: var(--surface-glass) !important;
+    border: 1px solid var(--surface-border) !important;
+    box-shadow: var(--surface-shadow);
+    backdrop-filter: blur(16px) saturate(110%);
+    -webkit-backdrop-filter: blur(16px) saturate(110%);
+    border-radius: 16px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+}
+
+/* Subtle Hover Lift for Interactable Cards */
+.report-card:hover, .dashboard-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2);
+    border-color: var(--primary-color) !important;
+}
+
+/* Navbar Specifics */
+.navbar {
+    border-radius: 0 0 16px 16px;
+    border-top: none !important;
+    z-index: 1000;
+}
+
+/* =========================================
+   4. INPUTS & FORMS (Focus Glows)
+   ========================================= */
+.form-control, .form-select {
+    background-color: var(--input-bg) !important;
+    border: 1px solid var(--input-border) !important;
+    color: var(--text-main) !important;
+    border-radius: 10px;
+    padding: 12px 15px;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 4px var(--primary-glow);
+    border-color: var(--primary-color) !important;
+    background-color: var(--input-bg);
+}
+
+/* Floating Label Fixes */
+.form-floating > label {
+    color: var(--text-muted);
+}
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+    color: var(--primary-color);
+    opacity: 0.9;
+}
+
+/* =========================================
+   5. UPLOAD AREA ANIMATION
+   ========================================= */
+.upload-area {
+    background: var(--input-bg);
+    border: 2px dashed var(--input-border);
+    border-radius: 16px;
+    padding: 3rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.upload-area:hover {
+    border-color: var(--primary-color);
+    background: var(--primary-glow);
+}
+
+/* =========================================
+   6. TABLES & LISTS
+   ========================================= */
+.table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--text-main);
+    --bs-table-hover-bg: rgba(255,255,255,0.05);
+    border-color: var(--surface-border);
+}
+
+/* Make table rows look separated */
+.table tbody tr {
+    transition: background-color 0.2s;
+}
+
+/* =========================================
+   7. BUTTONS & BADGES
+   ========================================= */
+.btn-primary-custom, .btn-primary {
+    background: var(--primary-color);
+    border: none;
+    box-shadow: 0 4px 15px var(--primary-glow);
+    color: #fff; /* Always white text on primary button */
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary-custom:hover, .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--primary-glow);
+    filter: brightness(1.1);
+}
+
+/* Badge Logic */
+.badge-soft-success, .bg-success-subtle {
+    background-color: var(--status-success-bg) !important;
+    color: var(--status-success-text) !important;
+    border: 1px solid var(--status-success-text);
+}
+
+.badge-soft-danger, .bg-danger-subtle {
+    background-color: var(--status-danger-bg) !important;
+    color: var(--status-danger-text) !important;
+    border: 1px solid var(--status-danger-text);
+}
+
+/* =========================================
+   8. DARK MODE FORCE OVERRIDES
+   ========================================= */
+[data-bs-theme="dark"] .text-dark { color: var(--text-main) !important; }
+[data-bs-theme="dark"] .text-secondary { color: var(--text-muted) !important; }
+[data-bs-theme="dark"] .text-muted { color: var(--text-muted) !important; }
+
+/* Invert icons or heavy backgrounds if needed */
+[data-bs-theme="dark"] .bg-light {
+    background-color: rgba(255,255,255,0.03) !important;
+    color: var(--text-main);
+    border: 1px solid var(--surface-border);
+}
+
+/* Headings pop in dark mode */
+[data-bs-theme="dark"] h1, [data-bs-theme="dark"] h2, 
+[data-bs-theme="dark"] h3, [data-bs-theme="dark"] h4, 
+[data-bs-theme="dark"] h5, [data-bs-theme="dark"] h6 {
+    color: #ffffff;
+    letter-spacing: -0.5px; /* Modern tight spacing */
+}
+
+/* =========================================
+   9. UTILITIES
+   ========================================= */
+.section-header {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+/* Back Link Styling */
+.back-link {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    z-index: 10;
+    transition: color 0.2s;
+}
+.back-link:hover {
+    color: var(--primary-color);
+}
+
+/* AI Suggestions Card Styling */
+.gradient-glass {
+    /* Light Mode: Subtle Blue-ish Tint */
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.1) 100%) !important;
+    border: 1px solid rgba(37, 99, 235, 0.2) !important;
+}
+
+.gradient-glass span {
+    color: var(--text-main); /* Makes text visible */
+}
+
+/* Dark Mode: Neon Blue Tint */
+[data-bs-theme="dark"] .gradient-glass {
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.1) 0%, rgba(37, 99, 235, 0.2) 100%) !important;
+    border: 1px solid rgba(96, 165, 250, 0.3) !important;
+}
+
+[data-bs-theme="dark"] .gradient-glass span {
+    color: #f1f5f9; /* White text for dark mode */
+}

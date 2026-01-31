@@ -15,6 +15,11 @@ from core.keyword_extractor import extract_keywords_from_jd
 from core.proof_checker import build_skill_evidence, proof_score_from_evidence
 from core.jd_parser import generate_suggestions
 from core.jd_templates import ROLE_TEMPLATES
+from core.ai_suggestions import generate_ai_suggestions
+from core.ai_interview_questions import generate_ai_interview_questions
+from core.ai_summary import generate_ai_summary
+
+
 
 app = Flask(__name__)
 app.secret_key = "hirelens-secret-key"  # later move to env variable
@@ -47,10 +52,43 @@ def analyze_resume(resume_text: str, jd_text: str, role: str = ""):
     if role in ROLE_RUBRICS:
         role_fit_score, rubric_breakdown = role_rubric_score(resume_text, ROLE_RUBRICS[role])
 
-    suggestions = generate_suggestions(missing)
-    interview_questions = generate_interview_questions(missing, evidence)
+    print(">>> ATS:", ats_score)
+    print(">>> Proof:", proof)
+    print(">>> Missing:", missing)
+    
+    ai_suggestions = generate_ai_suggestions(
+    ats_score=ats_score,
+    proof_score=proof,
+    missing_skills=missing,
+    role=role
+    
+
+)
+    print(">>> AI Suggestions:", ai_suggestions)
+
+    suggestions = ai_suggestions if ai_suggestions else generate_suggestions(missing)
+    
+    ai_questions = generate_ai_interview_questions(
+    ats_score=ats_score,
+    proof_score=proof,
+    missing_skills=missing,
+    evidence=evidence,
+    role=role
+)
+
+    interview_questions = (
+    ai_questions if ai_questions
+    else generate_interview_questions(missing, evidence)
+)
+    ai_summary = generate_ai_summary(
+    ats_score=ats_score,
+    proof_score=proof,
+    missing_skills=missing,
+    role=role
+)
 
     return {
+        "ai_summary": ai_summary,
         "interview_questions": interview_questions,
         "ats_score": ats_score,
         "proof_score": proof,
