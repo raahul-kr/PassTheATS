@@ -26,7 +26,10 @@ app.secret_key = "hirelens-secret-key"  # later move to env variable
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 if DATABASE_URL:
-    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL + "?sslmode=require"
 else:
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///hirelens.db"
 
