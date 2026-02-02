@@ -23,7 +23,13 @@ from core.ai_summary import generate_ai_summary
 
 app = Flask(__name__)
 app.secret_key = "hirelens-secret-key"  # later move to env variable
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///hirelens.db"
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if DATABASE_URL:
+    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+else:
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///hirelens.db"
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
