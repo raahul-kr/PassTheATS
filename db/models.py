@@ -6,9 +6,19 @@ db = None
 def init_db(app):
     global db
     mongo_uri = os.environ.get("MONGO_URI", "mongodb://localhost:27017/passtheats")
-    client = MongoClient(mongo_uri)
+    client = MongoClient(
+        mongo_uri, 
+        serverSelectionTimeoutMS=5000, 
+        connectTimeoutMS=5000, 
+        socketTimeoutMS=5000
+    )
     # The database name will be 'passtheats'
     db = client["passtheats"]
+    
+    try:
+        db.users.create_index("email", unique=True, background=True)
+    except:
+        pass
 
 def get_db():
     return db

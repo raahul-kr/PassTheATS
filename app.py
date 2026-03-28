@@ -233,6 +233,13 @@ def login():
     return render_template("login.html")
 
 
+@app.route("/forgot", methods=["GET", "POST"])
+def forgot():
+    if request.method == "POST":
+        return render_template("forgot.html", error="Password reset is currently disabled. Please contact support.")
+    return render_template("forgot.html")
+
+
 @app.route("/logout")
 def logout():
     session.clear()
