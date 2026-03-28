@@ -18,6 +18,12 @@
 
 [Live Demo](https://passtheats.onrender.com) · [Quick Start](#-quick-start) · [Features](#-features) · [Deploy](#-deployment)
 
+<br>
+
+<img src="static/assets/demo.gif" width="90%" alt="PassTheATS Demo" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+
+<br>
+
 <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" width="100%" />
 
 </div>
