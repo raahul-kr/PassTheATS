@@ -142,7 +142,10 @@ def index():
                 "report_json": json.dumps(result),
                 "created_at": datetime.utcnow()
             }
-            target_db.reports.insert_one(report_doc)
+            try:
+                target_db.reports.insert_one(report_doc)
+            except Exception:
+                pass
 
         return render_template("report.html", **result)
 
@@ -180,7 +183,10 @@ def demo():
                 "missing_keywords": ",".join(result["missing"]),
                 "created_at": datetime.utcnow()
             }
-            target_db.reports.insert_one(report_doc)
+            try:
+                target_db.reports.insert_one(report_doc)
+            except Exception:
+                pass
 
         return render_template("report.html", **result)
 
@@ -195,22 +201,25 @@ def register():
         password = request.form.get("password", "")
 
         target_db = get_db()
-        if target_db.users.find_one({"email": email}):
-            return render_template("register.html", error="Email already registered.")
+        try:
+            if target_db.users.find_one({"email": email}):
+                return render_template("register.html", error="Email already registered.")
 
-        password_hash = generate_password_hash(password)
+            password_hash = generate_password_hash(password)
 
-        user_doc = {
-            "name": name,
-            "email": email,
-            "password_hash": password_hash,
-            "created_at": datetime.utcnow()
-        }
-        res = target_db.users.insert_one(user_doc)
+            user_doc = {
+                "name": name,
+                "email": email,
+                "password_hash": password_hash,
+                "created_at": datetime.utcnow()
+            }
+            res = target_db.users.insert_one(user_doc)
 
-        session["user_id"] = str(res.inserted_id)
-        session["user_name"] = name
-        return redirect(url_for("history"))
+            session["user_id"] = str(res.inserted_id)
+            session["user_name"] = name
+            return redirect(url_for("history"))
+        except Exception as e:
+            return render_template("register.html", error=f"Database connection error: {str(e)[:50]}... Is your Render IP allowed in MongoDB Atlas Network Access?")
 
     return render_template("register.html")
 
@@ -222,13 +231,16 @@ def login():
         password = request.form.get("password", "")
 
         target_db = get_db()
-        user_doc = target_db.users.find_one({"email": email})
-        if not user_doc or not check_password_hash(user_doc.get("password_hash", ""), password):
-            return render_template("login.html", error="Invalid email or password.")
+        try:
+            user_doc = target_db.users.find_one({"email": email})
+            if not user_doc or not check_password_hash(user_doc.get("password_hash", ""), password):
+                return render_template("login.html", error="Invalid email or password.")
 
-        session["user_id"] = str(user_doc["_id"])
-        session["user_name"] = user_doc["name"]
-        return redirect(url_for("history"))
+            session["user_id"] = str(user_doc["_id"])
+            session["user_name"] = user_doc["name"]
+            return redirect(url_for("history"))
+        except Exception as e:
+            return render_template("login.html", error=f"Database connection error: {str(e)[:50]}... Is your Render IP allowed in MongoDB Atlas Network Access?")
 
     return render_template("login.html")
 
@@ -252,8 +264,12 @@ def history():
         return redirect(url_for("login"))
 
     target_db = get_db()
-    reports_docs = target_db.reports.find({"user_id": session["user_id"]}).sort("created_at", -1)
-    reports = [Report(doc) for doc in reports_docs]
+    try:
+        reports_docs = target_db.reports.find({"user_id": session["user_id"]}).sort("created_at", -1)
+        reports = [Report(doc) for doc in reports_docs]
+    except Exception:
+        reports = []
+        
     return render_template("history.html", reports=reports)
 
 
