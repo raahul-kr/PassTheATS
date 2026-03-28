@@ -1,30 +1,36 @@
-from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+import os
+from pymongo import MongoClient
 
-db = SQLAlchemy()
+db = None
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), nullable=False)
-    email = db.Column(db.String(150), unique=True, nullable=False)
-    password_hash = db.Column(db.String(250), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+def init_db(app):
+    global db
+    mongo_uri = os.environ.get("MONGO_URI", "mongodb://localhost:27017/passtheats")
+    client = MongoClient(mongo_uri)
+    # The database name will be 'passtheats'
+    db = client["passtheats"]
 
-class Report(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+def get_db():
+    return db
 
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    user = db.relationship("User", backref="reports")
+class User:
+    def __init__(self, doc):
+        self.id = str(doc.get("_id"))
+        self.name = doc.get("name")
+        self.email = doc.get("email")
+        self.password_hash = doc.get("password_hash")
+        self.created_at = doc.get("created_at")
 
-    role = db.Column(db.String(50), nullable=True)
-    ats_score = db.Column(db.Float, nullable=False)
-    proof_score = db.Column(db.Float, nullable=False)
-    risk_level = db.Column(db.String(20), nullable=False)
-    role_fit_score = db.Column(db.Float, nullable=True)
-
-    matched_keywords = db.Column(db.Text, nullable=True)
-    missing_keywords = db.Column(db.Text, nullable=True)
-
-    report_json = db.Column(db.Text, nullable=True)  
-
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+class Report:
+    def __init__(self, doc):
+        self.id = str(doc.get("_id"))
+        self.user_id = doc.get("user_id")
+        self.role = doc.get("role")
+        self.ats_score = doc.get("ats_score")
+        self.proof_score = doc.get("proof_score")
+        self.risk_level = doc.get("risk_level")
+        self.role_fit_score = doc.get("role_fit_score")
+        self.matched_keywords = doc.get("matched_keywords")
+        self.missing_keywords = doc.get("missing_keywords")
+        self.report_json = doc.get("report_json")
+        self.created_at = doc.get("created_at")
